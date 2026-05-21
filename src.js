@@ -1,6 +1,7 @@
 let upperJaw = new Image;
 let lowerJaw = new Image;
 let options = new Image;
+
 let time = 0;
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
@@ -40,6 +41,8 @@ function init(){
     upperJaw.src = "/assets/hunt-upper-jaw.png";
     lowerJaw.src = "/assets/wumpus-bottom-jaw.png";
     options.src = "/assets/options.png";
+    let button = `<img src="/assets/arrow-key.png" width="40" height="40" >`;
+    document.querySelector('#move').innerHTML += button;
     locationGeneration();
     requestAnimationFrame(gameLoop);
 }
@@ -100,10 +103,10 @@ function gameLoop(){
     requestAnimationFrame(gameLoop);
 }
 
-
-
+let original = ctx.getTransform();
 function drawHUD(){
-    ctx.textAlign = "start"
+    ctx.setTransform(original);
+    ctx.textAlign = "start";
     ctx.fillStyle = "black";
     console.log(document.querySelector('#game').style.border)
     let index = 0;
@@ -128,8 +131,9 @@ function drawHUD(){
     }
 
     ctx.fillText("MOVE", 140, 240);
-    ctx.textAlign = "right"
+    ctx.textAlign = "right";
     ctx.fillText("SHOOT", canvas.width - 140, 240);
+
 }
 
 let warnings = [];
@@ -148,6 +152,7 @@ function updateRoom(){
             }
         }
     }
+
 }
 
 document.addEventListener('click', e => {
@@ -158,7 +163,7 @@ document.addEventListener('click', e => {
     }
 })
 
-document.addEventListener('keydown', e => {
+document.addEventListener('mousemove', e => {
     
 })
 
