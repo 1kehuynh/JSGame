@@ -16,17 +16,27 @@ const player = {
 const wumpus = {
     health : 5,
     room : [],
-    warning : "You smell a horrid stench!"
+    warning : "You smell a horrid stench!",
+    action: function(){
+
+    }
+   
 }
 
 const bats = {
     room : [],
-    warning : "You hear high pitched squeaking!"
+    warning : "You hear high pitched squeaking!",
+    action: function(){
+        
+    }
 }
 
 const pits = {
     room : [],
-    warning : "You feel a draft!"
+    warning : "You feel a draft!",
+    action: function(){
+        
+    }
 }
 
 const cave = [];
@@ -44,7 +54,7 @@ function init(){
     options.src = "/assets/options.png";
     //button.src = "/assets/arrow-key.png"
     for(let i = 0; i < 4; i++){
-        document.querySelector('#move').innerHTML += `<img src="/assets/arrow-key.png" id="move${i}" width="50px" height="50px" style="transform: rotate(${i*90}deg)">`;
+        document.querySelector('#move').innerHTML += `<img src="/assets/arrow-key.png" id="move${i}" width="50px" role="button" height="50px" style="transform: rotate(${i*90}deg)">`;
         //document.querySelector('#move').innerHTML += `<div width="50px" height="50px " class="place"></div>`
     }
     document.querySelectorAll('img').forEach(img => {
@@ -64,6 +74,7 @@ function init(){
             img.addEventListener("click", e => {
                 if(player.room[0].id < 24){
                     player.room[0] = cave[player.room[0].id + 6]
+                    
                 }
             })
         }else if(img.id == 'move3'){
@@ -85,7 +96,7 @@ function locationGeneration(){
         cave.push({
             id : i,
             connected : []
-        })
+        }) 
         roomsLeft.push(i);
     }
     console.log("RoomsLeft: " + roomsLeft);
@@ -182,12 +193,21 @@ function drawHUD(){
     */
 }
 
+function move(){
+
+}
+
 let warnings = [];
 let adjacent = []
 function updateRoom(){
     warnings = [];
-    adjacent = [player.room + 1, player.room- 1, player.room + 6, player.room - 6];
+    adjacent = [player.room[0].id + 1, player.room[0].id - 1, player.room[0].id + 6, player.room[0].id - 6];
     for(let hazard of hazards){
+        for(let i = 0; i < hazard.room.length; i++){
+            if(hazard.room[i].id == player[0].id){
+                hazard.action();
+            }
+        }
         for(let room of adjacent){
             for(let i = 0; i < hazard.room.length; i++){
                 if(hazard.room[i].id == room){
