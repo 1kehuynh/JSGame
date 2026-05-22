@@ -45,8 +45,7 @@ function init(){
     //button.src = "/assets/arrow-key.png"
     for(let i = 0; i < 4; i++){
         document.querySelector('#move').innerHTML += `<img src="/assets/arrow-key.png" id="move${i}" width="50px" height="50px" style="transform: rotate(${i*90}deg)">`;
-
-        document.querySelector('#move').innerHTML += `<div width="50px" height="50px " class="place"></div>`
+        //document.querySelector('#move').innerHTML += `<div width="50px" height="50px " class="place"></div>`
     }
     document.querySelectorAll('img').forEach(img => {
         if(img.id == 'move0'){
@@ -55,18 +54,25 @@ function init(){
                     player.room[0] = cave[player.room[0].id - 6]
                 }
             })
-        } else if(img.id == 'move1'){
+        }else if(img.id == 'move1'){
             img.addEventListener("click", e => {
                 if((player.room[0].id + 1) % 6 != 0){
                     player.room[0] = cave[player.room[0].id + 1]
                 }
             })
-        }  else if(img.id == 'move1'){
+        }else if(img.id == 'move2'){
             img.addEventListener("click", e => {
-                if((player.room[0].id + 1) % 6 != 0){
-                    player.room[0] = cave[player.room[0].id + 1]
+                if(player.room[0].id < 24){
+                    player.room[0] = cave[player.room[0].id + 6]
                 }
-            })}
+            })
+        }else if(img.id == 'move3'){
+            img.addEventListener("click", e => {
+                if((player.room[0].id % 6) != 0){
+                    player.room[0] = cave[player.room[0].id - 1]
+                }
+            })
+        }
     })
     //document.querySelector('#move')*/
     locationGeneration();

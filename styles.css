@@ -16,13 +16,13 @@ body {
   z-index: 1;
 }
 
-/*
+
 #buttons{
   position: absolute;
   top: 50%;
   left: 23%;
   transform: translate(-50%, -50%);
-  z-index: 9000;
+  z-index: 2;
   rotate: 20;
 }
 img{
@@ -35,9 +35,16 @@ img:hover{
   box-sizing: border-box;
   border: 1px solid rgba(255, 255, 255, 0.9);
   border-radius: 20%; 
-}*/
+}
 
 
+#title{
+  position: relative;
+  color: rgb(255, 51, 0);
+  z-index: 3;
+}
+
+/*
 #move {
   box-sizing: content-box;
   position: relative;
