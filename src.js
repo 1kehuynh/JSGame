@@ -1,6 +1,7 @@
 let upperJaw = new Image;
 let lowerJaw = new Image;
 let options = new Image;
+//let button = new Image;
 
 let time = 0;
 const canvas = document.querySelector("canvas");
@@ -32,7 +33,7 @@ const cave = [];
 const entities = [player, wumpus, bats, pits];
 const hazards = [wumpus, bats, pits];
 
-let gameStarted = false;
+let gameStarted = true;
 let wumpusNear = false;
 
 init();
@@ -41,8 +42,20 @@ function init(){
     upperJaw.src = "/assets/hunt-upper-jaw.png";
     lowerJaw.src = "/assets/wumpus-bottom-jaw.png";
     options.src = "/assets/options.png";
-    let button = `<img src="/assets/arrow-key.png" width="40" height="40" >`;
-    document.querySelector('#move').innerHTML += button;
+    //button.src = "/assets/arrow-key.png"
+    for(let i = 0; i < 4; i++){
+        document.querySelector('#move').innerHTML += `<img src="/assets/arrow-key.png" id="move${i} width="50" height="50" style="transform: rotate(${i*90}deg)">`;
+    }
+    document.querySelectorAll('img').forEach(img => {
+        img.translate(50, 50);
+        img.style.transform = "rotate(90deg)"
+        img.addEventListener("click", e => {
+            ctx.fillStyle = 'red';
+            ctx.fillText('Clicked!', 20, 40);
+            document.querySelector('#move').innerHTML += `<img src="/assets/arrow-key.png" id="move${i}" width="50" height="50" >`;
+        })
+    })
+    //document.querySelector('#move')*/
     locationGeneration();
     requestAnimationFrame(gameLoop);
 }
@@ -89,6 +102,8 @@ function drawMenu(){
     ctx.fillText("Tap Anywhere to Start", canvas.width/2, canvas.height/2);
 }
 
+let xPos = 0;
+let yPos = 0;
 function gameLoop(){
     time++;
     ctx.fillStyle = "black";
@@ -130,10 +145,18 @@ function drawHUD(){
         ctx.fillText("Alerts:", 35, 600);
     }
 
-    ctx.fillText("MOVE", 140, 240);
+    ctx.fillText("MOVE", 149, 200);
     ctx.textAlign = "right";
-    ctx.fillText("SHOOT", canvas.width - 140, 240);
-
+    ctx.fillText("SHOOT", canvas.width - 149, 200);
+    /*
+    ctx.translate(194,340);
+    for(let i = 0; i < 4; i++){
+        ctx.drawImage(button, -30, -100, 60, 60);
+        ctx.rotate(-Math.PI/2);
+    }*/
+    ctx.fillText('x: ' + xPos, 100, 300);
+    ctx.fillText('y: ' + yPos, 300, 300);
+    
 }
 
 let warnings = [];
@@ -163,8 +186,10 @@ document.addEventListener('click', e => {
     }
 })
 
+
 document.addEventListener('mousemove', e => {
-    
+    xPos = e.clientX;
+    yPos = e.clientY;
 })
 
 
