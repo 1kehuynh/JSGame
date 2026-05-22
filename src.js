@@ -44,16 +44,29 @@ function init(){
     options.src = "/assets/options.png";
     //button.src = "/assets/arrow-key.png"
     for(let i = 0; i < 4; i++){
-        document.querySelector('#move').innerHTML += `<img src="/assets/arrow-key.png" id="move${i} width="50" height="50" style="transform: rotate(${i*90}deg)">`;
+        document.querySelector('#move').innerHTML += `<img src="/assets/arrow-key.png" id="move${i}" width="50px" height="50px" style="transform: rotate(${i*90}deg)">`;
+
+        document.querySelector('#move').innerHTML += `<div width="50px" height="50px " class="place"></div>`
     }
     document.querySelectorAll('img').forEach(img => {
-        img.translate(50, 50);
-        img.style.transform = "rotate(90deg)"
-        img.addEventListener("click", e => {
-            ctx.fillStyle = 'red';
-            ctx.fillText('Clicked!', 20, 40);
-            document.querySelector('#move').innerHTML += `<img src="/assets/arrow-key.png" id="move${i}" width="50" height="50" >`;
-        })
+        if(img.id == 'move0'){
+            img.addEventListener("click", e => {
+                if(player.room[0].id > 6){
+                    player.room[0] = cave[player.room[0].id - 6]
+                }
+            })
+        } else if(img.id == 'move1'){
+            img.addEventListener("click", e => {
+                if((player.room[0].id + 1) % 6 != 0){
+                    player.room[0] = cave[player.room[0].id + 1]
+                }
+            })
+        }  else if(img.id == 'move1'){
+            img.addEventListener("click", e => {
+                if((player.room[0].id + 1) % 6 != 0){
+                    player.room[0] = cave[player.room[0].id + 1]
+                }
+            })}
     })
     //document.querySelector('#move')*/
     locationGeneration();
@@ -74,7 +87,7 @@ function locationGeneration(){
         let roomIndex = Math.floor(Math.random()*roomsLeft.length);
         let room = roomsLeft[roomIndex];
         if(entity == player){  
-            entity.room = cave[room].id;
+            entity.room.push(cave[room]);
             roomsLeft.splice(roomIndex, 1)
         } else if(entity == wumpus){
             entity.room.push(cave[room]);
@@ -123,12 +136,16 @@ function drawHUD(){
     ctx.setTransform(original);
     ctx.textAlign = "start";
     ctx.fillStyle = "black";
-    console.log(document.querySelector('#game').style.border)
     let index = 0;
     ctx.fillStyle = "white"
     ctx.font = "20px serif"
     for(let key in player) {
-        ctx.fillText(`${key}: ${player[key]}`, index * 200 + 35, 40);
+        if(key == 'room'){
+            ctx.fillText(`${key}: ${player[key][0].id}`, index * 200 + 35, 40);
+        }
+        else{
+            ctx.fillText(`${key}: ${player[key]}`, index * 200 + 35, 40);
+        }
         index++;
     }
 
@@ -153,10 +170,10 @@ function drawHUD(){
     for(let i = 0; i < 4; i++){
         ctx.drawImage(button, -30, -100, 60, 60);
         ctx.rotate(-Math.PI/2);
-    }*/
+    }
     ctx.fillText('x: ' + xPos, 100, 300);
     ctx.fillText('y: ' + yPos, 300, 300);
-    
+    */
 }
 
 let warnings = [];
