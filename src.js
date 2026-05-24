@@ -147,10 +147,30 @@ function gameLoop(){
         drawMenu();
     } else {
         drawHUD();
-
+        drawGame();
     }
 
     requestAnimationFrame(gameLoop);
+}
+
+let roomW = 80;
+let roomH = 80;
+let xOffSet = 120;
+function drawGame(){
+    for(let i = 0; i < 5; i++){
+        ctx.lineWidth = 3;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        for(let j = 0; j < 6; j++){
+            if(player.room[0] == i * 5 + j){
+                ctx.strokeStyle = "red";
+            } else {
+                ctx.strokeStyle = "white";
+            }
+            ctx.strokeRect(j * roomW + (1280/2 - (roomW * 6)/2), i * roomH + xOffSet, roomW, roomH);
+            ctx.fillText(i * 5 + j, j * roomW + (1280/2 - (roomW * 6)/2) + roomW/2, i * roomH + (roomH/2) + xOffSet);
+        }
+    }
 }
 
 let original = ctx.getTransform();
