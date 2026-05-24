@@ -7,6 +7,9 @@ let time = 0;
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 
+let warnings = [];
+let adjacent = [];
+
 const player = {
     room : [],
     bullets: 4,
@@ -18,7 +21,7 @@ const wumpus = {
     room : [],
     warning : "You smell a horrid stench!",
     action: function(){
-
+        console.log("wumpus")
     }
    
 }
@@ -27,7 +30,7 @@ const bats = {
     room : [],
     warning : "You hear high pitched squeaking!",
     action: function(){
-        
+        console.log("bats")
     }
 }
 
@@ -35,13 +38,13 @@ const pits = {
     room : [],
     warning : "You feel a draft!",
     action: function(){
-        
+        console.log("draft")
     }
 }
 
 const cave = [];
 const entities = [player, wumpus, bats, pits];
-const hazards = [wumpus, bats, pits];
+const hazards = [wumpus, pits, bats];
 
 let gameStarted = true;
 let wumpusNear = false;
@@ -60,44 +63,46 @@ function init(){
     document.querySelectorAll('img').forEach(img => {
         if(img.id == 'move0'){
             img.addEventListener("click", e => {
-                if(player.room[0].id > 6){
-                    player.room[0] = cave[player.room[0].id - 6]
+                if(player.room[0] > 5){
+                    player.room[0] = cave[player.room[0] - 6]
+                    updateRoom();
                 }
             })
         }else if(img.id == 'move1'){
             img.addEventListener("click", e => {
-                if((player.room[0].id + 1) % 6 != 0){
-                    player.room[0] = cave[player.room[0].id + 1]
+                if((player.room[0] + 1) % 6 != 0){
+                    player.room[0] = cave[player.room[0] + 1]
+                    updateRoom();
                 }
             })
         }else if(img.id == 'move2'){
             img.addEventListener("click", e => {
-                if(player.room[0].id < 24){
-                    player.room[0] = cave[player.room[0].id + 6]
+                if(player.room[0] < 24){
+                    player.room[0] = cave[player.room[0] + 6]
+                    updateRoom();
                     
                 }
             })
         }else if(img.id == 'move3'){
             img.addEventListener("click", e => {
-                if((player.room[0].id % 6) != 0){
-                    player.room[0] = cave[player.room[0].id - 1]
+                if((player.room[0] % 6) != 0){
+                    player.room[0] = cave[player.room[0] - 1]
+                    updateRoom();
                 }
             })
         }
     })
     //document.querySelector('#move')*/
     locationGeneration();
+    updateRoom();
     requestAnimationFrame(gameLoop);
 }
 
 function locationGeneration(){
-    let roomsLeft = []
-    for(let i = 0; i < 30; i++){
-        cave.push({
-            id : i,
-            connected : []
-        }) 
+    let roomsLeft = [];
+    for(let i = 0; i < 29; i++){
         roomsLeft.push(i);
+        cave.push(i);
     }
     console.log("RoomsLeft: " + roomsLeft);
     for(let entity of entities){
@@ -158,7 +163,7 @@ function drawHUD(){
     ctx.font = "20px serif"
     for(let key in player) {
         if(key == 'room'){
-            ctx.fillText(`${key}: ${player[key][0].id}`, index * 200 + 35, 40);
+            ctx.fillText(`${key}: ${player[key][0]}`, index * 200 + 35, 40);
         }
         else{
             ctx.fillText(`${key}: ${player[key]}`, index * 200 + 35, 40);
@@ -179,9 +184,9 @@ function drawHUD(){
         ctx.fillText("Alerts:", 35, 600);
     }
 
-    ctx.fillText("MOVE", 149, 200);
+    ctx.fillText("MOVE", 110, 200);
     ctx.textAlign = "right";
-    ctx.fillText("SHOOT", canvas.width - 149, 200);
+    ctx.fillText("SHOOT", canvas.width - 110, 200);
     /*
     ctx.translate(194,340);
     for(let i = 0; i < 4; i++){
@@ -193,27 +198,38 @@ function drawHUD(){
     */
 }
 
-function move(){
-
-}
-
-let warnings = [];
-let adjacent = []
 function updateRoom(){
     warnings = [];
-    adjacent = [player.room[0].id + 1, player.room[0].id - 1, player.room[0].id + 6, player.room[0].id - 6];
+    function playerRight(){
+        if((player.room[0] + 1) % 6 != 0){
+            return player.room[0] + 1;
+        } else {
+            return -1;
+        }
+    }
+    function playerLeft(){
+        if((player.room[0]) % 6 != 0){
+            return player.room[0] - 1;
+        } else {
+            return -1;
+        }
+    }
+    adjacent = [playerRight(), playerLeft(), player.room[0] + 6, player.room[0] - 6];
+    /*for each hazard, for each room in hazard, if the room equals the player's room, execute it's action, 
+    else for each room in adjacent, check the hazard's room against the adjacent rooms*/
     for(let hazard of hazards){
         for(let i = 0; i < hazard.room.length; i++){
-            if(hazard.room[i].id == player[0].id){
+            if(hazard.room[i] == player.room[0]){
+                console.log("hazard")
                 hazard.action();
-            }
-        }
-        for(let room of adjacent){
-            for(let i = 0; i < hazard.room.length; i++){
-                if(hazard.room[i].id == room){
-                    console.log(adjacent);
-                    console.log(hazard.warning);
-                    warnings.push(hazard.warning);
+            } else {
+                for(let room of adjacent){
+                    if(hazard.room[i] == room){
+                        console.log(adjacent);
+                        console.log(hazard.warning);
+                        warnings.push(hazard.warning);
+                    }
+                    
                 }
             }
         }
@@ -224,7 +240,6 @@ function updateRoom(){
 document.addEventListener('click', e => {
     if(!gameStarted){
         gameStarted = true;
-        updateRoom();
     } else {
     }
 })
