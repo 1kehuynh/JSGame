@@ -17,14 +17,22 @@ body {
 }
 
 
-#buttons{
+#move{
   position: absolute;
   top: 50%;
   left: 23%;
   transform: translate(-50%, -50%);
   z-index: 2;
-  rotate: 20;
 }
+
+#shoot{
+  position: absolute;
+  top: 50%;
+  right: 3%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
 img{
   object-position: center center;
   margin: 10px;

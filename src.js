@@ -9,11 +9,16 @@ const ctx = canvas.getContext("2d");
 
 let warnings = [];
 let adjacent = [];
+let roomsVisited = [];
+const cave = [];
+
+let gameStarted = true;
+let gameOver = false;
 
 const player = {
     room : [],
-    bullets: 4,
-    turns: 0,
+    bullets: 3,
+    turns: -1,
 }
 
 const wumpus = {
@@ -21,7 +26,8 @@ const wumpus = {
     room : [],
     warning : "You smell a horrid stench!",
     action: function(){
-        console.log("wumpus")
+        console.log("wumpus");
+        gameOver = true;
     }
    
 }
@@ -30,7 +36,10 @@ const bats = {
     room : [],
     warning : "You hear high pitched squeaking!",
     action: function(){
-        console.log("bats")
+        console.log("bat");
+        player.room[0] = cave[Math.floor(Math.random()*cave.length)];
+        updateRoom();
+
     }
 }
 
@@ -38,16 +47,14 @@ const pits = {
     room : [],
     warning : "You feel a draft!",
     action: function(){
-        console.log("draft")
+        console.log("draft");
+        gameOver = true;
     }
 }
 
-const cave = [];
 const entities = [player, wumpus, bats, pits];
 const hazards = [wumpus, pits, bats];
 
-let gameStarted = true;
-let wumpusNear = false;
 
 init();
 
@@ -57,42 +64,61 @@ function init(){
     options.src = "/assets/options.png";
     //button.src = "/assets/arrow-key.png"
     for(let i = 0; i < 4; i++){
-        document.querySelector('#move').innerHTML += `<img src="/assets/arrow-key.png" id="move${i}" width="50px" role="button" height="50px" style="transform: rotate(${i*90}deg)">`;
+        document.querySelector('#move').innerHTML += `<img src="/assets/arrow-key.png" class="moveBtns" id="move${i}" width="50px" role="button" height="50px" style="transform: rotate(${i*90}deg)">`;
         //document.querySelector('#move').innerHTML += `<div width="50px" height="50px " class="place"></div>`
     }
-    document.querySelectorAll('img').forEach(img => {
-        if(img.id == 'move0'){
-            img.addEventListener("click", e => {
+    for(let i = 0; i < 4; i++){
+        document.querySelector('#shoot').innerHTML += `<img src="/assets/arrow-key.png" class="shootBtns" id="shoot${i}" width="50px" role="button" height="50px" style="transform: rotate(${i*90}deg)">`;
+    }
+    document.childNodes
+    document.querySelectorAll('.moveBtns').forEach(img => {
+        img.addEventListener("click", e => {
+            if(img.id == 'move0'){
                 if(player.room[0] > 5){
-                    player.room[0] = cave[player.room[0] - 6]
-                    updateRoom();
+                    player.room[0] = cave[player.room[0] - 6];
                 }
-            })
-        }else if(img.id == 'move1'){
-            img.addEventListener("click", e => {
+            }else if(img.id == 'move1'){
                 if((player.room[0] + 1) % 6 != 0){
-                    player.room[0] = cave[player.room[0] + 1]
-                    updateRoom();
+                    player.room[0] = cave[player.room[0] + 1];
                 }
-            })
-        }else if(img.id == 'move2'){
-            img.addEventListener("click", e => {
+            }else if(img.id == 'move2'){
                 if(player.room[0] < 24){
-                    player.room[0] = cave[player.room[0] + 6]
-                    updateRoom();
-                    
+                    player.room[0] = cave[player.room[0] + 6];                 
                 }
-            })
-        }else if(img.id == 'move3'){
-            img.addEventListener("click", e => {
+            }else if(img.id == 'move3'){
                 if((player.room[0] % 6) != 0){
-                    player.room[0] = cave[player.room[0] - 1]
-                    updateRoom();
+                    player.room[0] = cave[player.room[0] - 1];
                 }
-            })
-        }
-    })
-    //document.querySelector('#move')*/
+            }
+            updateRoom();
+        })
+    });
+    
+    document.querySelectorAll('.shootBtns').forEach(img => {
+        img.addEventListener("click", e => {
+            if(img.id == 'shoot0'){
+                if(player.room[0] > 5){
+                    player.room[0] = cave[player.room[0] - 6];
+                }
+            }else if(img.id == 'shoot1'){
+                if(((player.room[0] + 1) % 6) != 0){
+                    player.room[0] = cave[player.room[0] + 1];
+                }
+            }else if(img.id == 'shoot2'){
+                if(player.room[0] < 24){
+                    player.room[0] = cave[player.room[0] + 6];
+                }
+            }else if(img.id == 'shoot3'){
+                if((player.room[0] % 6) != 0){
+                    player.room[0] = cave[player.room[0] - 1];
+                }
+            }
+            player.bullets--;
+            if(player.bullets == 0){
+                gameOver = true;
+            }
+        })
+    });
     locationGeneration();
     updateRoom();
     requestAnimationFrame(gameLoop);
@@ -100,7 +126,7 @@ function init(){
 
 function locationGeneration(){
     let roomsLeft = [];
-    for(let i = 0; i < 29; i++){
+    for(let i = 0; i < 30; i++){
         roomsLeft.push(i);
         cave.push(i);
     }
@@ -145,7 +171,9 @@ function gameLoop(){
     ctx.fillRect(0, 0, canvas.width, canvas.height)
     if(!gameStarted){
         drawMenu();
-    } else {
+    }else if(gameOver){
+        
+    }else {
         drawHUD();
         drawGame();
     }
@@ -162,13 +190,27 @@ function drawGame(){
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         for(let j = 0; j < 6; j++){
-            if(player.room[0] == i * 5 + j){
-                ctx.strokeStyle = "red";
+            if(player.room[0] == i * 6 + j){
+                ctx.fillStyle = "white"
+                ctx.fillRect(j * roomW + (1280/2 - (roomW * 6)/2), i * roomH + xOffSet, roomW, roomH);
+                ctx.fillStyle = "red";
+                ctx.fillText(i * 6 + j, j * roomW + (1280/2 - (roomW * 6)/2) + roomW/2, i * roomH + (roomH/2) + xOffSet);
             } else {
-                ctx.strokeStyle = "white";
+                ctx.fillStyle = "white"
+                ctx.fillText(i * 6 + j, j * roomW + (1280/2 - (roomW * 6)/2) + roomW/2, i * roomH + (roomH/2) + xOffSet);
+                for(let k = 0; k < roomsVisited.length; k++){
+                    if(i * 6 + j == roomsVisited[k]){
+                        ctx.fillStyle = "gray";
+                        ctx.fillRect(j * roomW + (1280/2 - (roomW * 6)/2), i * roomH + xOffSet, roomW, roomH);
+                        ctx.fillStyle = "black";
+                        ctx.fillText(i * 6 + j, j * roomW + (1280/2 - (roomW * 6)/2) + roomW/2, i * roomH + (roomH/2) + xOffSet);
+                        break;
+                    }
+                }
+                 
             }
+            ctx.strokeStyle = "white";
             ctx.strokeRect(j * roomW + (1280/2 - (roomW * 6)/2), i * roomH + xOffSet, roomW, roomH);
-            ctx.fillText(i * 5 + j, j * roomW + (1280/2 - (roomW * 6)/2) + roomW/2, i * roomH + (roomH/2) + xOffSet);
         }
     }
 }
@@ -194,6 +236,11 @@ function drawHUD(){
     ctx.font = "23px serif"
     if(warnings.length > 0){
         for(let i = 0; i < warnings.length; i++){
+            if(warnings[i] == wumpus.warning){
+                ctx.fillStyle = "red";
+            }else{
+                ctx.fillStyle = "white";
+            }
             ctx.fillText(warnings[i], 35, 660 - i * 50);
         }
         ctx.font = "27px serif"
@@ -220,6 +267,9 @@ function drawHUD(){
 
 function updateRoom(){
     warnings = [];
+    roomsVisited.push(player.room[0]);
+    player.turns++;
+    console.log(roomsVisited)
     function playerRight(){
         if((player.room[0] + 1) % 6 != 0){
             return player.room[0] + 1;
