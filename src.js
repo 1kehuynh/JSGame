@@ -16,6 +16,7 @@ const cave = [];
 let gameStarted = false;
 let gameOver = false;
 let overCondition;
+let helpMenu = false;
 
 const player = {
     room : [],
@@ -113,6 +114,20 @@ function init(){
             }
         })
     });
+
+    document.querySelector('#help').addEventListener("click", e => {
+        helpMenu = !helpMenu;
+        let menu = document.querySelector('.helpMenu');
+        if(helpMenu){
+            e.currentTarget.innerHTML = 'X'; 
+            menu.style.visibility = 'visible'
+        } else {
+            e.currentTarget.innerHTML = '?';        
+            menu.style.visibility = 'hidden'
+        }
+        
+        e.stopPropagation(); 
+    });
     locationGeneration();
     updateRoom();
     requestAnimationFrame(gameLoop);
@@ -200,6 +215,14 @@ function endGame(reason){
     document.querySelector('#move').style.visibility = 'hidden';
 }
 
+function drawHelpMenu(){
+    /*
+    ctx.fillStyle = "white";
+    ctx.fillRect(canvas.width/10, canvas.height/9, canvas.width - 2 * canvas.width/10, canvas.height - 2 * canvas.height/9)
+    ctx.fillStyle = "black";
+    ctx.fillRect(canvas.width/10 + 2, canvas.height/9 + 2, canvas.width - 2 * canvas.width/10 - 4, canvas.height - 2 * canvas.height/9 - 4)*/
+}
+
 let xPos = 0;
 let yPos = 0;
 let fadeCount = 1;
@@ -210,44 +233,50 @@ function gameLoop(){
     if(!gameStarted){
         drawMenu();        
     }else if(gameOver){
-        ctx.font = "23px serif"
-        ctx.textAlign = "center";
-        ctx.fillStyle = "red";
-        let wumpusDead = 0;
-        if(overCondition == 'victory'){
-            ctx.fillStyle = "white";
-            ctx.fillText("Victory! You Successfully Killed the Wumpus!", canvas.width/2, canvas.height/10); 
-            wumpusDead = 50;
-        }else if(overCondition == 'wumpus'){
-            ctx.fillText("You Were Found and Eaten by the Wumpus!", canvas.width/2, canvas.height/10);
-        }else if(overCondition == 'pits'){
-            ctx.fillText("You Fell Into a Bottomless Pit!", canvas.width/2, canvas.height/10);
-        }else if(overCondition == 'bullets'){
-            ctx.fillText("You Ran Out of Bullets! You Were Eventually Found and Eaten by the Wumpus.", canvas.width/2, canvas.height/10);
-        }
-
-        let index = 0;       
-        for(let key in player) {
-            if(key == 'room'){
-                ctx.fillText(`${key}: ${player[key][0]}`, index * 200 + canvas.width/3, canvas.height/5);
-            }
-            else if(key == 'bullets' && overCondition == 'bullets'){
-                ctx.fillText(`${key}: ${player[key]}`, index * 200 + (canvas.width/2 - 200), canvas.height/5);
-            }else{
-                ctx.fillStyle = 'white';
-                ctx.fillText(`${key}: ${player[key]}`, index * 200 + (canvas.width/2 - 200), canvas.height/5);
-            }
-            index++;
-        }
-        ctx.fillText(`Score: ${100-(player.turns * 5)+(player.bullets * 5)+wumpusDead}`, canvas.width/2, 4 * canvas.height/6);
-        ctx.fillText('Restart to Play Again.', canvas.width/2, 3 * canvas.height/4);
+       drawGameOver();
     }else{
         drawHUD();
         drawGame();
     }
+    /*
+    if(helpMenu){
+        drawHelpMenu();
+    }*/
     requestAnimationFrame(gameLoop);
 }
+function drawGameOver(){
+    ctx.font = "23px serif"
+    ctx.textAlign = "center";
+    ctx.fillStyle = "red";
+    let wumpusDead = 0;
+    if(overCondition == 'victory'){
+        ctx.fillStyle = "white";
+        ctx.fillText("Victory! You Successfully Killed the Wumpus!", canvas.width/2, canvas.height/10); 
+        wumpusDead = 50;
+    }else if(overCondition == 'wumpus'){
+        ctx.fillText("You Were Found and Eaten by the Wumpus!", canvas.width/2, canvas.height/10);
+    }else if(overCondition == 'pit'){
+        ctx.fillText("You Fell Into a Bottomless Pit!", canvas.width/2, canvas.height/10);
+    }else if(overCondition == 'bullets'){
+        ctx.fillText("You Ran Out of Bullets! You Were Eventually Found and Eaten by the Wumpus.", canvas.width/2, canvas.height/10);
+    }
 
+    let index = 0;       
+    for(let key in player) {
+        if(key == 'room'){
+            ctx.fillText(`${key}: ${player[key][0]}`, index * 200 + canvas.width/3, canvas.height/5);
+        }
+        else if(key == 'bullets' && overCondition == 'bullets'){
+            ctx.fillText(`${key}: ${player[key]}`, index * 200 + (canvas.width/2 - 200), canvas.height/5);
+        }else{
+            ctx.fillStyle = 'white';
+            ctx.fillText(`${key}: ${player[key]}`, index * 200 + (canvas.width/2 - 200), canvas.height/5);
+        }
+        index++;
+    }
+    ctx.fillText(`Score: ${100-(player.turns)+(player.bullets * 5)+wumpusDead}`, canvas.width/2, 4 * canvas.height/6);
+    ctx.fillText('Restart to Play Again.', canvas.width/2, 3 * canvas.height/4);
+}
 let roomW = 80;
 let roomH = 80;
 let xOffSet = 120;

@@ -15,7 +15,35 @@
             <div id="move" width = "150px" height="150px" ></div>
             <div id="shoot"></div>
         </div>
+        <p id="help">?</p>
+        <div class = "helpMenu">
+            <p>Navigate through a series of caves while trying to find and shoot the wumpus, while avoiding hazards like pits or bats.</p>
+            <h4>How to Play:</h4>          
+            <p>*Note: For the following parts, adjacent means up, down, left, or right, not diagonals.</p>
+            <h5>Movement:</h5>
+            <p>Click the move buttons to move to rooms adjacent to your player. Your player's room is marked in white on the grid. It is also shown on the HUD.
+            Rooms that your player have been to turn gray. Each time you move, your turns go up by one.</p>
+            <h5>Alerts and Hazards:</h5>
+            <p>Hazards spawn randomly upon game start, in different rooms. Being in a room adjacent to a hazard triggers its alert.
+            Being in the room of the hazard triggers its action.</p>
+            <h6>Bats:</h6>
+            <p>There are 2 bats. Alert: "You hear high pitched squeaking!". Action: The bats transport you to a completely random room. 
+                It is possible the room it transports you to may contain a hazard, in which that case you immediately lose.
+            </p>
+            <h6>Pits:</h6>
+            <p>There are 2 pits. Alert: "You feel a draft!". Action: You immediately lose.</p>
+            <h6>Wumpus:</h6>          
+            <p>There is 1 wumpus. Alert: "You smell a horrid stench!". Action: You immediately lose.</p>
+            <h5>Shooting and GameOver</h5>
+            <p>You start with 3 bullets, and could shoot into adjacent rooms by using the shoot buttons. 
+            Upon clicking on a shoot button, your bullets decrease. If you run out of bullets, you lose. If you successfully shoot the wumpus, you win.
+            If you're in a room adjacent to a wumpus, but miss, the wumpus moves randomly to an adjacent room. It is possible through this way for the wumpus to enter a room
+            with a hazard, a room the player visited before, or the room the player is in (in which case you lose).
+            </p>
+
+        </div>
     </div>
+
     <script src="src.js"></script> 
     
 </body>

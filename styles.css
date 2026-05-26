@@ -52,13 +52,61 @@ img:hover{
 }
 
 
-#title{
-  position: relative;
-  color: rgb(255, 51, 0);
-  z-index: 3;
+#help {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: red;
+  border: 1px solid white;
+  
+  width: 40px;
+  height: 40px;
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
 }
 
+#help:hover {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: red;
+  border: 1px solid rgb(206, 20, 20);
+  
+  width: 40px;
+  height: 40px;
 
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  cursor: help;
+}
+
+.helpMenu{
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  visibility: hidden;
+  padding: 1%;
+  border: 5px solid rgb(255, 255, 255);
+  background-color: black;
+  position: absolute;
+  fill:antiquewhite;
+  color:rgb(206, 20, 20);
+  z-index: 5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 4px;
+  margin-bottom: 4px;  
+}
+
+p {
+  color:aliceblue;
+  margin-top: 0;   
+  margin-bottom: 10px;       
+}
 /*
 #move {
   box-sizing: content-box;
