@@ -16,6 +16,10 @@ body {
   z-index: 1;
 }
 
+#fade{
+  top: 50%;
+  left: 50%;
+}
 
 #move{
   position: absolute;
@@ -23,6 +27,7 @@ body {
   left: 23%;
   transform: translate(-50%, -50%);
   z-index: 2;
+  visibility: hidden
 }
 
 #shoot{
@@ -31,6 +36,7 @@ body {
   right: 3%;
   transform: translate(-50%, -50%);
   z-index: 2;
+  visibility: hidden;
 }
 
 img{
@@ -51,6 +57,7 @@ img:hover{
   color: rgb(255, 51, 0);
   z-index: 3;
 }
+
 
 /*
 #move {

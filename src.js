@@ -4,6 +4,7 @@ let options = new Image;
 //let button = new Image;
 
 let time = 0;
+const screen = document.querySelector(".screen");
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 
@@ -13,7 +14,8 @@ let roomsVisited = [];
 const cave = [];
 
 let gameStarted = true;
-let gameOver = false;
+let gameOver = true;
+let overCondition = "wumpus";
 
 const player = {
     room : [],
@@ -22,12 +24,11 @@ const player = {
 }
 
 const wumpus = {
-    health : 5,
     room : [],
     warning : "You smell a horrid stench!",
     action: function(){
         console.log("wumpus");
-        gameOver = true;
+        endGame("wumpus");
     }
    
 }
@@ -39,7 +40,6 @@ const bats = {
         console.log("bat");
         player.room[0] = cave[Math.floor(Math.random()*cave.length)];
         updateRoom();
-
     }
 }
 
@@ -47,8 +47,8 @@ const pits = {
     room : [],
     warning : "You feel a draft!",
     action: function(){
-        console.log("draft");
-        gameOver = true;
+        console.log("pit");
+        endGame("pit")
     }
 }
 
@@ -70,27 +70,25 @@ function init(){
     for(let i = 0; i < 4; i++){
         document.querySelector('#shoot').innerHTML += `<img src="/assets/arrow-key.png" class="shootBtns" id="shoot${i}" width="50px" role="button" height="50px" style="transform: rotate(${i*90}deg)">`;
     }
-    document.childNodes
     document.querySelectorAll('.moveBtns').forEach(img => {
         img.addEventListener("click", e => {
             if(img.id == 'move0'){
                 if(player.room[0] > 5){
-                    player.room[0] = cave[player.room[0] - 6];
+                    move(cave[player.room[0] - 6]);
                 }
             }else if(img.id == 'move1'){
                 if((player.room[0] + 1) % 6 != 0){
-                    player.room[0] = cave[player.room[0] + 1];
+                    move(cave[player.room[0] + 1]);
                 }
             }else if(img.id == 'move2'){
                 if(player.room[0] < 24){
-                    player.room[0] = cave[player.room[0] + 6];                 
+                    move(cave[player.room[0] + 6]);                 
                 }
             }else if(img.id == 'move3'){
                 if((player.room[0] % 6) != 0){
-                    player.room[0] = cave[player.room[0] - 1];
+                    move(cave[player.room[0] - 1]);
                 }
             }
-            updateRoom();
         })
     });
     
@@ -98,24 +96,20 @@ function init(){
         img.addEventListener("click", e => {
             if(img.id == 'shoot0'){
                 if(player.room[0] > 5){
-                    player.room[0] = cave[player.room[0] - 6];
+                    shoot(cave[player.room[0] - 6]);
                 }
             }else if(img.id == 'shoot1'){
                 if(((player.room[0] + 1) % 6) != 0){
-                    player.room[0] = cave[player.room[0] + 1];
+                    shoot(cave[player.room[0] + 1]);
                 }
             }else if(img.id == 'shoot2'){
                 if(player.room[0] < 24){
-                    player.room[0] = cave[player.room[0] + 6];
+                    shoot(cave[player.room[0] + 6]);
                 }
             }else if(img.id == 'shoot3'){
                 if((player.room[0] % 6) != 0){
-                    player.room[0] = cave[player.room[0] - 1];
+                    shoot(cave[player.room[0] - 1]);
                 }
-            }
-            player.bullets--;
-            if(player.bullets == 0){
-                gameOver = true;
             }
         })
     });
@@ -154,30 +148,100 @@ function locationGeneration(){
     }
 }
 
+function shoot(room){
+    player.bullets--;
+    let wumpusAdjacent = [];
+    if(room == wumpus.room[0]){
+        endGame("victory");
+    }else if ((player.bullets == 0 && gameOver == false)){
+        endGame("bullets");
+    }else if(warnings.includes(wumpus.warning)){
+        let wumpusAdjacent = []
+        if(wumpus.room[0] > 5){
+            wumpusAdjacent.push(wumpus.room[0] - 6);
+        }
+        if((wumpus.room[0]) < 24){
+            wumpusAdjacent.push(wumpus.room[0] + 6);
+        }
+        if((wumpus.room[0] + 1) % 6 != 0){
+            wumpusAdjacent.push(wumpus.room[0] + 1);
+        } 
+        if((wumpus.room[0]) % 6 != 0){
+            wumpusAdjacent.push(wumpus.room[0]- 1);
+        }
+        wumpus.room[0] = wumpusAdjacent[Math.floor(Math.random()*wumpusAdjacent.length)];
+        updateRoom();
+        warnings.push("You missed! The wumpus moved away!")
+    }else {
+        warnings.push(`You shot into room ${room}! It had no wumpus.`)
+    }
+}
+
+function move(room){
+    player.room[0] = room;
+    updateRoom();
+}
+
 function drawMenu(){
     ctx.font = "27px serif"
     ctx.textAlign = "center"
     ctx.drawImage(upperJaw, canvas.width/2 - upperJaw.width/2 , 15*Math.cos((Math.PI/200) * time) + 40);
+    ctx.fillStyle = `rgba(250,250,250,${0.5*Math.cos((Math.PI/300) * time) + 0.5})`;
+    ctx.fillText("the", canvas.width/2, 180);
     ctx.drawImage(lowerJaw, canvas.width/2 - lowerJaw.width/2, -15*Math.cos((Math.PI/200) * time) + 200);
-    ctx.fillStyle = "red";
-    ctx.fillText("Tap Anywhere to Start", canvas.width/2, canvas.height/2);
+    ctx.fillStyle = `rgba(250,10,10,${0.5*Math.sin((Math.PI/300) * time) + 0.5})`;
+    ctx.fillText("Tap Anywhere to Start", canvas.width/2, canvas.height/2 + 20);
+}
+
+function endGame(reason){
+    gameOver = true;
+    overCondition = reason;
+    document.querySelector('#shoot').style.visibility = 'hidden';
+    document.querySelector('#move').style.visibility = 'hidden';
 }
 
 let xPos = 0;
 let yPos = 0;
+let fadeCount = 1;
 function gameLoop(){
     time++;
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvas.width, canvas.height)
     if(!gameStarted){
-        drawMenu();
+        drawMenu();        
     }else if(gameOver){
-        
-    }else {
+        ctx.font = "23px serif"
+        ctx.textAlign = "center";
+        ctx.fillStyle = "red";
+        if(overCondition == 'victory'){
+            ctx.fillStyle = "white";
+            ctx.fillText("Victory! You Successfully Killed the Wumpus!", canvas.width/2, canvas.height/10); 
+        }else if(overCondition == 'wumpus'){
+            ctx.fillText("You Were Found and Eaten by the Wumpus!", canvas.width/2, canvas.height/3);
+        }else if(overCondition == 'pits'){
+            ctx.fillText("You Fell Into a Bottomless Pit!", canvas.width/2, canvas.height/3);
+        }else if(overCondtion == 'bullets'){
+            ctx.fillText("You Ran Out of Bullets! You Were Eventually Found and Eaten by the Wumpus", canvas.width/2, canvas.height/3);
+        }
+        let index = 0;
+        for(let key in player) {
+            if(key == 'room'){
+                ctx.fillText(`${key}: ${player[key][0]}`, index * 200 + canvas.width/3, canvas.height/6);
+            }
+            else if(key == 'bullet' && overCondition == 'bullets'){
+                ctx.fillStyle = 'red';
+                ctx.fillText(`${key}: ${player[key]}`, index * 200 + (canvas.width/2 - 200), canvas.height/6);
+            }else{
+                ctx.fillStyle = 'white';
+                ctx.fillText(`${key}: ${player[key]}`, index * 200 + (canvas.width/2 - 200), canvas.height/6);
+            }
+            index++;
+        }
+        ctx.fillText('Restart to Play Again.', canvas.width/2, 3 * canvas.height/4);
+    }else{
         drawHUD();
         drawGame();
     }
-
     requestAnimationFrame(gameLoop);
 }
 
@@ -207,7 +271,7 @@ function drawGame(){
                         break;
                     }
                 }
-                 
+                  
             }
             ctx.strokeStyle = "white";
             ctx.strokeRect(j * roomW + (1280/2 - (roomW * 6)/2), i * roomH + xOffSet, roomW, roomH);
@@ -238,19 +302,24 @@ function drawHUD(){
         for(let i = 0; i < warnings.length; i++){
             if(warnings[i] == wumpus.warning){
                 ctx.fillStyle = "red";
+            }else if(warnings[i].includes("You shot into room ")){
+                ctx.fillStyle = "yellow";
             }else{
                 ctx.fillStyle = "white";
             }
-            ctx.fillText(warnings[i], 35, 660 - i * 50);
+            ctx.fillText(warnings[i], 5, (660 - warnings.length * 50) + (1 + i) * 50);
         }
         ctx.font = "27px serif"
-        ctx.fillText("Alerts:", 35, 660 - warnings.length * 50);
+        ctx.fillStyle = "white";
+        ctx.fillText("Alerts:", 5, 660 - warnings.length * 50);
     } else {
-        ctx.fillText("The Cave is Quiet ... For Now...", 35, 660);
+        ctx.fillText("The Cave is Quiet ... For Now...", 5, 660);
         ctx.font = "27px serif"
-        ctx.fillText("Alerts:", 35, 600);
+        ctx.fillStyle = "white";
+        ctx.fillText("Alerts:", 5, 600);
     }
 
+   
     ctx.fillText("MOVE", 110, 200);
     ctx.textAlign = "right";
     ctx.fillText("SHOOT", canvas.width - 110, 200);
@@ -299,7 +368,6 @@ function updateRoom(){
                         console.log(hazard.warning);
                         warnings.push(hazard.warning);
                     }
-                    
                 }
             }
         }
@@ -310,7 +378,8 @@ function updateRoom(){
 document.addEventListener('click', e => {
     if(!gameStarted){
         gameStarted = true;
-    } else {
+        document.querySelector('#shoot').style.visibility = 'visible';
+        document.querySelector('#move').style.visibility = 'visible';
     }
 })
 
